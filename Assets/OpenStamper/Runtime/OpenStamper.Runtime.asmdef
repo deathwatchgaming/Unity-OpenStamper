@@ -1,0 +1,16 @@
+{
+    "name": "OpenStamper.Runtime",
+    "rootNamespace": "OpenStamper",
+    "references": [
+        "OpenHeightmap.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

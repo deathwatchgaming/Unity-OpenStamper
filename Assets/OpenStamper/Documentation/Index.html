@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStamper - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --oh-primary: #1a7a3a;
+            --oh-dark: #0f1419;
+            --oh-surface: #1a1f25;
+            --oh-border: #2d3339;
+            --oh-text: #e4e6ea;
+            --oh-muted: #8b929a;
+            --oh-accent: #3fb950;
+            --oh-code: #161b22;
+            --os-stamp: #d29922;
+            --bs-body-color: #e4e6ea;
+            --bs-body-color-rgb: 228, 230, 234;
+            --bs-body-bg: #0f1419;
+            --bs-secondary-color: #8b929a;
+            --bs-secondary-color-rgb: 139, 146, 154;
+            --bs-link-color: #3fb950;
+        }
+        body {
+            background-color: var(--oh-dark);
+            color: var(--oh-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+        }
+        .navbar { background-color: var(--oh-surface) !important; border-bottom: 1px solid var(--oh-border); }
+        .navbar-brand { font-weight: 700; letter-spacing: -0.5px; }
+        .badge-stamp { background-color: var(--os-stamp); color: #000; }
+        .badge-blend { background-color: #a371f7; }
+        .badge-layer { background-color: #1f6feb; }
+        .badge-preset { background-color: #da3633; }
+        .card {
+            background-color: var(--oh-surface);
+            border: 1px solid var(--oh-border);
+            margin-bottom: 1.5rem;
+        }
+        .card-header { background-color: rgba(255,255,255,0.03); border-bottom: 1px solid var(--oh-border); }
+        pre {
+            background-color: var(--oh-code);
+            border: 1px solid var(--oh-border);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        code { color: var(--oh-accent); }
+        .hero { padding: 4rem 0 2rem; text-align: center; }
+        .hero h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; }
+        .hero .lead { color: var(--oh-muted); font-size: 1.2rem; max-width: 600px; margin: 1rem auto; }
+        .section { padding: 3rem 0; }
+        .feature-icon { font-size: 2rem; margin-bottom: 1rem; color: var(--os-stamp); }
+        .toc-link { color: var(--oh-accent); text-decoration: none; }
+        .toc-link:hover { text-decoration: underline; color: var(--oh-text); }
+        .param-table td:first-child { font-family: monospace; color: var(--oh-accent); white-space: nowrap; }
+        h2 { border-bottom: 1px solid var(--oh-border); padding-bottom: 0.5rem; }
+        .pipeline-arrow { color: var(--oh-accent); font-size: 1.5rem; }
+        .sidebar { position: sticky; top: 80px; }
+        .sidebar .nav-link { color: var(--oh-muted); padding: 0.3rem 0; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: var(--oh-text); }
+        .dep-alert {
+            background-color: rgba(218, 54, 51, 0.12);
+            border: 1px solid rgba(218, 54, 51, 0.4);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .dep-alert .bi { color: #da3633; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="bi bi-grid-3x3-gap"></i> OpenStamper</a>
+        <span class="navbar-text text-muted small">v1.0 &mdash; Unity 6 URP</span>
+    </div>
+</nav>
+
+<div class="container" style="padding-top: 70px;">
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>OpenStamper</h1>
+        <p class="lead">A stamp-based terrain compositing tool for Unity 6. Layer procedural features onto existing heightmaps with blend modes, preset libraries, and live preview.</p>
+        <div class="mt-4">
+            <code>Tools &gt; OpenStamper &nbsp;(Ctrl+Alt+S)</code>
+        </div>
+    </div>
+
+    <!-- Dependency Warning -->
+    <div class="dep-alert mb-5">
+        <h5 class="mb-2"><i class="bi bi-exclamation-triangle-fill"></i> Required Dependency: OpenHeightmap</h5>
+        <p class="mb-2"><strong>OpenStamper requires the OpenHeightmap asset to be installed in your project.</strong></p>
+        <p class="mb-0">OpenStamper uses OpenHeightmap's <code>HeightmapData</code> container, <code>HeightmapExporter</code>, and <code>ExportFormat</code> enum at both runtime and editor level. If the <code>Assets/OpenHeightmap</code> folder is not present, OpenStamper will fail to compile with errors like:</p>
+        <pre class="mt-2 mb-0"><code>The type or namespace name 'HeightmapData' could not be found (are you missing a using directive or an assembly reference?)</code></pre>
+        <p class="text-muted small mt-2 mb-0">Install OpenHeightmap first, then add OpenStamper on top.</p>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar TOC -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="#quickstart">Quick Start</a>
+                    <a class="nav-link" href="#features">Features</a>
+                    <a class="nav-link" href="#stamps">Stamp Types</a>
+                    <a class="nav-link" href="#blend">Blend Modes</a>
+                    <a class="nav-link" href="#workflow">Workflow</a>
+                    <a class="nav-link" href="#presets">Preset Libraries</a>
+                    <a class="nav-link" href="#api">API Reference</a>
+                    <a class="nav-link" href="#structure">File Structure</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+
+            <!-- Quick Start -->
+            <section id="quickstart" class="section">
+                <h2><i class="bi bi-rocket"></i> Quick Start</h2>
+                <ol>
+                    <li>Install <strong>OpenHeightmap</strong> into your project first.</li>
+                    <li>Copy the <code>Assets/OpenStamper</code> folder into your project.</li>
+                    <li>Go to <strong>Tools &gt; OpenStamper</strong> (or press <code>Ctrl+Alt+S</code>).</li>
+                    <li>Click <strong>Load Base</strong> to import a heightmap from file, or <strong>Load OpenHeightmap</strong> to grab the current heightmap directly from the OpenHeightmap window. <strong>RAW16 recommended</strong> for full 16-bit precision.</li>
+                    <li>Use the <strong>Stamps</strong> tab to add stamp layers (Crater, Mountain, Ridge, etc.).</li>
+                    <li>Adjust position, radius, blend mode, intensity and the stamp's own shape settings in the <strong>Layer</strong> tab. Each layer keeps its own settings, so two craters can differ.</li>
+                    <li>Click <strong>Apply All</strong> to composite the stack onto the heightmap.</li>
+                    <li>Click <strong>Apply to Terrain</strong> to push to a scene terrain, or <strong>Export</strong> to save as PNG, RAW16, or EXR.</li>
+                </ol>
+                <p class="text-muted small mb-0">Stamps keep the base terrain's heights: adding a stamp never rescales the rest of the map. Anything stamped above 1 or below 0 is clipped on export, unless <strong>Normalize Result</strong> (Export tab) is on, which stretches the final heights to fill 0&ndash;1. If the scene has no terrain, <strong>Apply to Terrain</strong> creates one using the <strong>New Terrain</strong> settings in the Export tab (with <em>Auto Height</em> on, the height is a percentage of the width, 40% by default, adjustable with <strong>Height (% of width)</strong>; <strong>Load OpenHeightmap</strong> also copies OpenHeightmap's setting, so a preset's suggested height carries over), with its own <code>TerrainData</code> asset in <code>Assets/OpenStamper Generated</code> (kept outside the tool folder, so updating the tool never touches your terrains).</p>
+                <div class="alert alert-info mt-3" style="background-color: rgba(31,111,235,0.12); border-color: rgba(31,111,235,0.4);">
+                    <h6 class="mb-1 text-white"><i class="bi bi-info-circle"></i> Recommended Workflow</h6>
+                    <p class="mb-1 text-white">For best results, use <strong>RAW16</strong> format throughout the pipeline:</p>
+                    <p class="mb-0"><code>OpenHeightmap (generate) &rarr; Export RAW16 &rarr; OpenStamper (load .raw) &rarr; Apply stamps &rarr; Export RAW16 &rarr; Unity Terrain (Import Heightmap)</code></p>
+                    <p class="text-muted small mb-0 mt-1">RAW16 and PNG both store 16-bit height precision (65,536 levels); EXR stores full 32-bit floats. RAW16 is the format Unity's terrain <em>Import Raw</em> reads directly. EXR import depends on your Unity version; use RAW16 if an EXR won't load.</p>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section id="features" class="section">
+                <h2><i class="bi bi-list-stars"></i> Features</h2>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                                <h5>7 Procedural Stamps</h5>
+                                <p class="text-muted mb-0">Crater, Mountain, Ridge, Valley, Plateau, River, and Noise. Each with unique configurable parameters.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-layers-half"></i></div>
+                                <h5>8 Blend Modes</h5>
+                                <p class="text-muted mb-0">Add, Subtract, Multiply, Max, Min, Average, Replace, and Power. Control how stamps interact with existing terrain.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-stack"></i></div>
+                                <h5>Layer Stack</h5>
+                                <p class="text-muted mb-0">Stack unlimited stamps, reorder them, toggle individual layers, and preview single layers in isolation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-eye"></i></div>
+                                <h5>Live Preview</h5>
+                                <p class="text-muted mb-0">CPU-rendered colored heightmap preview with zoom and click-to-read height. Rendered once per change, so editing stays responsive.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-collection"></i></div>
+                                <h5>Preset Libraries</h5>
+                                <p class="text-muted mb-0">4 built-in presets (Impact Site, Mountain Valley, River Cut, Mesa). Save and load custom libraries as ScriptableObjects.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-terrain"></i></div>
+                                <h5>Apply to Terrain</h5>
+                                <p class="text-muted mb-0">Push stamped heightmap directly to a terrain in the scene. Creates new terrain or updates existing with undo support.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="feature-icon"><i class="bi bi-download"></i></div>
+                                <h5>Multi-Format Import &amp; Export</h5>
+                                <p class="text-muted mb-0">Import square PNG, RAW16 (16-bit precision), or EXR (where Unity supports it). Export as PNG (16-bit), RAW16, or EXR. RAW16 recommended for full-precision pipelines.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stamp Types -->
+            <section id="stamps" class="section">
+                <h2><i class="bi bi-grid-3x3-gap"></i> Stamp Types</h2>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> Crater</div>
+                    <div class="card-body">
+                        <p>Circular impact crater: the floor sits below the surrounding ground, the inner wall rises back up, and the rim stands above it. Use the <strong>Add</strong> blend mode.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>Depth</td><td>How deep the crater floor sits below the rim</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>RimHeight</td><td>Height of the raised rim above base level</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>RimWidth</td><td>Width of the rim as fraction of radius</td><td>0.01 &ndash; 0.5</td></tr>
+                                <tr><td>FloorFlatness</td><td>0 = bowl shape, 1 = perfectly flat floor</td><td>0 &ndash; 1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> Mountain</div>
+                    <div class="card-body">
+                        <p>Conical mountain peak with configurable steepness, base width, and procedural erosion noise.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>PeakHeight</td><td>Maximum height of the peak</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>Steepness</td><td>Power curve controlling cone sharpness</td><td>1 &ndash; 10</td></tr>
+                                <tr><td>BaseWidth</td><td>Width of the mountain base relative to stamp radius</td><td>0.1 &ndash; 1</td></tr>
+                                <tr><td>Erosion</td><td>Procedural erosion noise that carves ridges</td><td>0 &ndash; 1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> Ridge</div>
+                    <div class="card-body">
+                        <p>Elongated linear ridge with configurable width, jaggedness, and branching probability.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>Height</td><td>Maximum ridge height</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>Width</td><td>Width of the ridge base</td><td>0.01 &ndash; 0.5</td></tr>
+                                <tr><td>Jaggedness</td><td>Irregularity along the ridge line</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>Branching</td><td>Probability of secondary ridge branches</td><td>0 &ndash; 1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> Valley</div>
+                    <div class="card-body">
+                        <p>Canyon or river valley cut with configurable wall steepness and winding path.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>Depth</td><td>How deep the valley floor sits</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>FloorWidth</td><td>Width of the flat valley floor</td><td>0.01 &ndash; 0.5</td></tr>
+                                <tr><td>WallSteepness</td><td>How cliff-like the walls are</td><td>1 &ndash; 10</td></tr>
+                                <tr><td>Winding</td><td>How much the valley meanders</td><td>0 &ndash; 1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> Plateau</div>
+                    <div class="card-body">
+                        <p>Flat-topped elevated area (mesa/butte) with configurable rim sharpness and surface roughness.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>Height</td><td>Elevation of the plateau top</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>RimSharpness</td><td>How abrupt the rim transition is</td><td>1 &ndash; 10</td></tr>
+                                <tr><td>SurfaceRoughness</td><td>Texture variation on the flat top</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>Erosion</td><td>Irregularity on the rim edges</td><td>0 &ndash; 1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> River</div>
+                    <div class="card-body">
+                        <p>Meandering river channel with configurable depth, width, and sinuosity.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>Depth</td><td>Maximum channel depth</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>Width</td><td>Width of the river channel</td><td>0.01 &ndash; 0.3</td></tr>
+                                <tr><td>MeanderFrequency</td><td>How often the river bends</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>MeanderAmplitude</td><td>How far the river deviates from straight</td><td>0 &ndash; 1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="badge badge-stamp">Stamp</span> Noise</div>
+                    <div class="card-body">
+                        <p>Generic multi-octave noise stamp. Catch-all for organic shapes with configurable frequency, amplitude, and noise type.</p>
+                        <table class="table table-sm table-dark mt-2">
+                            <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
+                            <tbody>
+                                <tr><td>Frequency</td><td>Noise scale. Higher = finer detail</td><td>0.1 &ndash; 10</td></tr>
+                                <tr><td>Amplitude</td><td>Output strength</td><td>0 &ndash; 1</td></tr>
+                                <tr><td>Octaves</td><td>Number of noise layers (fractal detail)</td><td>1 &ndash; 6</td></tr>
+                                <tr><td>NoiseType</td><td>Perlin, Value, Absolute, or Ridged</td><td>0 &ndash; 3</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blend Modes -->
+            <section id="blend" class="section">
+                <h2><i class="bi bi-palette"></i> Blend Modes</h2>
+                <p>Each stamp layer has a blend mode that controls how it merges with existing terrain heights. Blending only happens inside the stamp's radius: the final height is <code>lerp(terrain, result, coverage &times; intensity)</code>, where coverage fades from 1 at the center to 0 at the edge (shaped by <strong>Falloff Power</strong>). Intensity above 1 only adds extra strength for Add and Subtract.</p>
+                <table class="table table-sm table-dark">
+                    <thead><tr><th>Mode</th><th>Formula</th><th>Use Case</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Add</strong></td><td>result = terrain + stamp</td><td>The default for every stamp: raised shapes rise, carving shapes (Crater, Valley, River) dig in</td></tr>
+                        <tr><td><strong>Subtract</strong></td><td>result = terrain - stamp</td><td>The exact opposite of Add: a mountain becomes a pit, a crater becomes a mound</td></tr>
+                        <tr><td><strong>Multiply</strong></td><td>result = terrain * stamp</td><td>Erosion overlay, terrain modulation</td></tr>
+                        <tr><td><strong>Max</strong></td><td>result = max(terrain, stamp)</td><td>Peak sculpting, cliff capping</td></tr>
+                        <tr><td><strong>Min</strong></td><td>result = min(terrain, stamp)</td><td>Floor lowering, peak cutting</td></tr>
+                        <tr><td><strong>Average</strong></td><td>result = (terrain + stamp) / 2</td><td>Smooth blending, terrain correction</td></tr>
+                        <tr><td><strong>Replace</strong></td><td>result = stamp</td><td>Full overwrite within stamp area</td></tr>
+                        <tr><td><strong>Power</strong></td><td>result = terrain ^ (1 - stamp)</td><td>Contrast adjustment, sharpening</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Workflow -->
+            <section id="workflow" class="section">
+                <h2><i class="bi bi-diagram-3"></i> Workflow</h2>
+                <p>OpenStamper works as a layer stack composited onto an existing heightmap.</p>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <code class="me-2">Load Base Heightmap</code>
+                        <span class="pipeline-arrow">&rarr;</span>
+                        <code class="mx-2">Add Stamp Layers</code>
+                        <span class="pipeline-arrow">&rarr;</span>
+                        <code class="mx-2">Adjust Parameters</code>
+                        <span class="pipeline-arrow">&rarr;</span>
+                        <code class="mx-2">Apply Stack</code>
+                        <span class="pipeline-arrow">&rarr;</span>
+                        <code class="ms-2">Export</code>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 small">The stack processes top-to-bottom of the Layer list (the last layer is applied last). Each enabled layer is sampled directly at the heightmap's resolution, so stamps stay sharp, and blended according to its blend mode. <strong>Radius</strong> is the distance from the stamp's center to its edge, as a fraction of the terrain width. <strong>Preview This Layer</strong> shows one layer on the base without changing the result; click <strong>Back to Result</strong> to return. Loading a saved library works on a copy, so edits never change the saved asset until you save again. The base heightmap and stack survive script recompiles.</p>
+            </section>
+
+            <!-- Preset Libraries -->
+            <section id="presets" class="section">
+                <h2><i class="bi bi-collection"></i> Preset Libraries</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body py-3">
+                                <h6 class="mb-1">Impact Site</h6>
+                                <small class="text-muted">One large crater stamp (Add). A sunken floor ringed by a raised rim.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body py-3">
+                                <h6 class="mb-1">Mountain Valley</h6>
+                                <small class="text-muted">Two long ridges with a valley carved between them (all Add). A natural mountain pass.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body py-3">
+                                <h6 class="mb-1">River Cut</h6>
+                                <small class="text-muted">Meandering river stamp (Add) spanning most of the terrain. Carves a sinuous channel.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body py-3">
+                                <h6 class="mb-1">Mesa</h6>
+                                <small class="text-muted">A broad plateau stamp (Add) with noise subtracted from its top. A flat-topped, weathered mesa.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted small mt-3">Save your own configurations as <strong>StampLibrary</strong> ScriptableObjects via <strong>Assets &gt; Create &gt; OpenStamper &gt; Stamp Library</strong>.</p>
+            </section>
+
+            <!-- API Reference -->
+            <section id="api" class="section">
+                <h2><i class="bi bi-code-slash"></i> API Reference</h2>
+
+                <div class="card">
+                    <div class="card-header"><code>IStampProvider</code></div>
+                    <div class="card-body">
+                        <pre><code>public interface IStampProvider
+{
+    string Name { get; }
+    float Sample(float u, float v);  // normalized [0,1] UV space
+}</code></pre>
+                        <p>All stamp types implement this interface. Returns height relative to the surrounding ground: 0 = no change, positive = raised (up to about 1), negative = carved below ground (Crater floor, Valley, River). With <strong>Add</strong> every stamp looks the way its name suggests. <strong>Invert</strong> flips the sign, so raised shapes become carved and carved shapes become raised.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><code>StampLayer</code></div>
+                    <div class="card-body">
+                        <pre><code>var layer = new StampLayer("My Stamp");
+layer.StampTypeIndex = 1;  // Mountain
+layer.Position = new Vector2(0.5f, 0.5f);
+layer.Radius = 0.15f;
+layer.BlendMode = BlendMode.Add;
+layer.Intensity = 0.8f;
+layer.Mountain.PeakHeight = 0.9f;  // this layer's own Mountain settings
+
+IStampProvider shape = layer.GetProvider();   // settings for the current StampTypeIndex
+float[,] stampMap = layer.GenerateStampMap(shape, 257);</code></pre>
+                        <p>Defines a single stamp placement. Contains position, radius, rotation, blend mode, and its own copy of every stamp type's shape settings.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><code>StampCompositor</code></div>
+                    <div class="card-body">
+                        <pre><code>var compositor = new StampCompositor();
+compositor.Composite(heightmap, stack);
+
+HeightmapData preview = compositor.PreviewSingle(heightmap, layer);
+HeightmapData fullPreview = compositor.PreviewStack(heightmap, stack);</code></pre>
+                        <p>Blends the full stamp stack onto a <code>HeightmapData</code>. Each layer is sampled at the heightmap's resolution using its own settings and blended per its <code>BlendMode</code>, only inside its radius.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><code>StampProviderRegistry</code></div>
+                    <div class="card-body">
+                        <pre><code>List&lt;IStampProvider&gt; stamps = StampProviderRegistry.Providers;
+List&lt;string&gt; names = StampProviderRegistry.Names;
+IStampProvider crater = StampProviderRegistry.GetProvider(0);</code></pre>
+                        <p>Registry of the 7 built-in stamp types: names, order (<code>StampTypeIndex</code>) and default settings. Each layer keeps its own settings copy; to add a stamp type, add it here and in <code>StampLayer</code>.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><code>StampLibrary</code> <small class="text-muted">(ScriptableObject)</small></div>
+                    <div class="card-body">
+                        <pre><code>// Create via Assets &gt; Create &gt; OpenStamper &gt; Stamp Library
+var library = StampLibrary.Create("Assets/MyLibrary.asset");
+library.Stack = myStack.Clone();  // save a copy, not a live reference
+
+// Load a built-in preset
+library.LoadPreset("Impact Site");</code></pre>
+                        <p>Persistent stamp stack configuration. Save/load stamp setups as project assets.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- File Structure -->
+            <section id="structure" class="section">
+                <h2><i class="bi bi-folder2"></i> File Structure</h2>
+<pre><code>Assets/OpenStamper/
+├── Documentation/
+│   └── Index.html                  &larr; this file
+├── Editor/
+│   ├── OpenStamperWindow.cs        Main EditorWindow (4 tabs + preview)
+│   ├── PreviewRenderer.cs          CPU color-mapped preview (rendered once per change)
+│   ├── StampExporter.cs            Export delegate + stamp PNG export
+│   └── OpenStamper.Editor.asmdef   References OpenStamper.Runtime + OpenHeightmap
+├── Runtime/
+│   ├── BlendMode.cs                8 blend mode enum
+│   ├── StampLayer.cs               Stamp definition + per-layer shape settings
+│   ├── StampStack.cs               Layer collection with add/remove/reorder/clone
+│   ├── StampCompositor.cs          Composites stack onto HeightmapData
+│   ├── StampProviderRegistry.cs    Central registry of all stamp types
+│   ├── OpenStamper.Runtime.asmdef  References OpenHeightmap.Runtime
+│   ├── Stamps/
+│   │   ├── IStampProvider.cs       Interface
+│   │   ├── CraterStamp.cs
+│   │   ├── MountainStamp.cs
+│   │   ├── RidgeStamp.cs
+│   │   ├── ValleyStamp.cs
+│   │   ├── PlateauStamp.cs
+│   │   ├── RiverStamp.cs
+│   │   └── NoiseStamp.cs
+│   └── Library/
+│       └── StampLibrary.cs         ScriptableObject for preset save/load
+</code></pre>
+            </section>
+
+            <!-- Footer -->
+            <hr style="border-color: var(--oh-border);">
+            <footer class="text-muted text-center py-4 small">
+                OpenStamper v1.0 &mdash; Unity 6 URP &mdash; Stamp-based terrain compositing &mdash; Requires OpenHeightmap
+            </footer>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelectorAll('.toc-link, .sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
