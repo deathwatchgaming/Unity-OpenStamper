@@ -45,7 +45,7 @@ Full documentation, covering every stamp, blend mode, preset and the API, is inc
 
 ## Previews
 
-See the [Previews](Previews) folder for a rendered image of every preset.
+See the [Previews](https://github.com/deathwatchgaming/Unity-OpenStamper/tree/main/Previews) folder for a rendered image of every preset.
 
 ## License
 
