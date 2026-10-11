@@ -41,6 +41,8 @@ Generated terrains are saved to `Assets/OpenStamper Generated`, outside the tool
 Full documentation, covering every stamp, blend mode, preset and the API, is included with the tool:
 `Assets/OpenStamper/Documentation/Index.html` (open it in your browser).
 
+- [Read Online](https://deathwatchgaming.github.io/Unity-OpenStamper/Assets/OpenStamper/Documentation/Index.html)
+
 ## Previews
 
 See the [Previews](Previews) folder for a rendered image of every preset.
