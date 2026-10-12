@@ -1,13 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenStamper - Documentation</title>
+    <script>
+        // Pick the theme before the page draws so it never flashes the wrong colours.
+        // A saved choice wins; otherwise follow the system light/dark setting.
+        (function () {
+            var theme = null;
+
+            try {
+                theme = localStorage.getItem('openToolsDocsTheme');
+            } catch (e) {
+                theme = null;
+            }
+
+            if (theme !== 'light' && theme !== 'dark') {
+                var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                theme = prefersLight ? 'light' : 'dark';
+            }
+
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        :root {
+        /* Dark theme (default) */
+        :root,
+        [data-bs-theme="dark"] {
             --oh-primary: #1a7a3a;
             --oh-dark: #0f1419;
             --oh-surface: #1a1f25;
@@ -23,6 +45,33 @@
             --bs-secondary-color: #8b929a;
             --bs-secondary-color-rgb: 139, 146, 154;
             --bs-link-color: #3fb950;
+            --oh-header: rgba(255, 255, 255, 0.03);
+            --oh-table: #212529;
+            --bs-border-color: #2d3339;
+            --bs-emphasis-color: #ffffff;
+        }
+
+        /* Light theme */
+        [data-bs-theme="light"] {
+            --oh-primary: #1a7a3a;
+            --oh-dark: #f6f8fa;
+            --oh-surface: #ffffff;
+            --oh-border: #d0d7de;
+            --oh-text: #1f2328;
+            --oh-muted: #59636e;
+            --oh-accent: #1a7f37;
+            --oh-code: #f6f8fa;
+            --os-stamp: #9a6700;
+            --oh-header: rgba(0, 0, 0, 0.03);
+            --oh-table: #f6f8fa;
+            --bs-body-color: #1f2328;
+            --bs-body-color-rgb: 31, 35, 40;
+            --bs-body-bg: #f6f8fa;
+            --bs-secondary-color: #59636e;
+            --bs-secondary-color-rgb: 89, 99, 110;
+            --bs-link-color: #1a7f37;
+            --bs-border-color: #d0d7de;
+            --bs-emphasis-color: #000000;
         }
         body {
             background-color: var(--oh-dark);
@@ -41,7 +90,7 @@
             border: 1px solid var(--oh-border);
             margin-bottom: 1.5rem;
         }
-        .card-header { background-color: rgba(255,255,255,0.03); border-bottom: 1px solid var(--oh-border); }
+        .card-header { background-color: var(--oh-header); border-bottom: 1px solid var(--oh-border); }
         pre {
             background-color: var(--oh-code);
             border: 1px solid var(--oh-border);
@@ -70,14 +119,36 @@
             padding: 1.25rem;
         }
         .dep-alert .bi { color: #da3633; }
+        .table {
+            --bs-table-bg: var(--oh-table);
+            --bs-table-color: var(--oh-text);
+            --bs-table-border-color: var(--oh-border);
+        }
+        .workflow-callout {
+            background-color: rgba(31, 111, 235, 0.12);
+            border-color: rgba(31, 111, 235, 0.4);
+            color: var(--oh-text);
+        }
+        .swatch { text-shadow: 0 0 1px var(--oh-muted); }
+        .theme-toggle {
+            color: var(--oh-muted);
+            border: 1px solid var(--oh-border);
+            line-height: 1;
+        }
+        .theme-toggle:hover, .theme-toggle:focus { color: var(--oh-text); border-color: var(--oh-muted); }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="#"><i class="bi bi-grid-3x3-gap"></i> OpenStamper</a>
-        <span class="navbar-text text-muted small">v1.0 &mdash; Unity 6 URP</span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="navbar-text text-muted small">v1.0 &mdash; Unity 6 URP</span>
+            <button type="button" class="btn btn-sm theme-toggle" id="themeToggle" title="Switch light / dark theme" aria-label="Switch light / dark theme">
+                <i class="bi bi-sun"></i>
+            </button>
+        </div>
     </div>
 </nav>
 
@@ -135,9 +206,9 @@
                     <li>Click <strong>Apply to Terrain</strong> to push to a scene terrain, or <strong>Export</strong> to save as PNG, RAW16, or EXR.</li>
                 </ol>
                 <p class="text-muted small mb-0">Stamps keep the base terrain's heights: adding a stamp never rescales the rest of the map. Anything stamped above 1 or below 0 is clipped on export, unless <strong>Normalize Result</strong> (Export tab) is on, which stretches the final heights to fill 0&ndash;1. If the scene has no terrain, <strong>Apply to Terrain</strong> creates one using the <strong>New Terrain</strong> settings in the Export tab (with <em>Auto Height</em> on, the height is a percentage of the width, 40% by default, adjustable with <strong>Height (% of width)</strong>; <strong>Load OpenHeightmap</strong> also copies OpenHeightmap's setting, so a preset's suggested height carries over), with its own <code>TerrainData</code> asset in <code>Assets/OpenStamper Generated</code> (kept outside the tool folder, so updating the tool never touches your terrains).</p>
-                <div class="alert alert-info mt-3" style="background-color: rgba(31,111,235,0.12); border-color: rgba(31,111,235,0.4);">
-                    <h6 class="mb-1 text-white"><i class="bi bi-info-circle"></i> Recommended Workflow</h6>
-                    <p class="mb-1 text-white">For best results, use <strong>RAW16</strong> format throughout the pipeline:</p>
+                <div class="alert alert-info workflow-callout mt-3">
+                    <h6 class="mb-1"><i class="bi bi-info-circle"></i> Recommended Workflow</h6>
+                    <p class="mb-1">For best results, use <strong>RAW16</strong> format throughout the pipeline:</p>
                     <p class="mb-0"><code>OpenHeightmap (generate) &rarr; Export RAW16 &rarr; OpenStamper (load .raw) &rarr; Apply stamps &rarr; Export RAW16 &rarr; Unity Terrain (Import Heightmap)</code></p>
                     <p class="text-muted small mb-0 mt-1">RAW16 and PNG both store 16-bit height precision (65,536 levels); EXR stores full 32-bit floats. RAW16 is the format Unity's terrain <em>Import Raw</em> reads directly. EXR import depends on your Unity version; use RAW16 if an EXR won't load.</p>
                 </div>
@@ -221,7 +292,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> Crater</div>
                     <div class="card-body">
                         <p>Circular impact crater: the floor sits below the surrounding ground, the inner wall rises back up, and the rim stands above it. Use the <strong>Add</strong> blend mode.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>Depth</td><td>How deep the crater floor sits below the rim</td><td>0 &ndash; 1</td></tr>
@@ -237,7 +308,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> Mountain</div>
                     <div class="card-body">
                         <p>Conical mountain peak with configurable steepness, base width, and procedural erosion noise.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>PeakHeight</td><td>Maximum height of the peak</td><td>0 &ndash; 1</td></tr>
@@ -253,7 +324,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> Ridge</div>
                     <div class="card-body">
                         <p>Elongated linear ridge with configurable width, jaggedness, and branching probability.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>Height</td><td>Maximum ridge height</td><td>0 &ndash; 1</td></tr>
@@ -269,7 +340,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> Valley</div>
                     <div class="card-body">
                         <p>Canyon or river valley cut with configurable wall steepness and winding path.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>Depth</td><td>How deep the valley floor sits</td><td>0 &ndash; 1</td></tr>
@@ -285,7 +356,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> Plateau</div>
                     <div class="card-body">
                         <p>Flat-topped elevated area (mesa/butte) with configurable rim sharpness and surface roughness.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>Height</td><td>Elevation of the plateau top</td><td>0 &ndash; 1</td></tr>
@@ -301,7 +372,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> River</div>
                     <div class="card-body">
                         <p>Meandering river channel with configurable depth, width, and sinuosity.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>Depth</td><td>Maximum channel depth</td><td>0 &ndash; 1</td></tr>
@@ -317,7 +388,7 @@
                     <div class="card-header"><span class="badge badge-stamp">Stamp</span> Noise</div>
                     <div class="card-body">
                         <p>Generic multi-octave noise stamp. Catch-all for organic shapes with configurable frequency, amplitude, and noise type.</p>
-                        <table class="table table-sm table-dark mt-2">
+                        <table class="table table-sm mt-2">
                             <thead><tr><th>Parameter</th><th>What It Does</th><th>Range</th></tr></thead>
                             <tbody>
                                 <tr><td>Frequency</td><td>Noise scale. Higher = finer detail</td><td>0.1 &ndash; 10</td></tr>
@@ -334,7 +405,7 @@
             <section id="blend" class="section">
                 <h2><i class="bi bi-palette"></i> Blend Modes</h2>
                 <p>Each stamp layer has a blend mode that controls how it merges with existing terrain heights. Blending only happens inside the stamp's radius: the final height is <code>lerp(terrain, result, coverage &times; intensity)</code>, where coverage fades from 1 at the center to 0 at the edge (shaped by <strong>Falloff Power</strong>). Intensity above 1 only adds extra strength for Add and Subtract.</p>
-                <table class="table table-sm table-dark">
+                <table class="table table-sm">
                     <thead><tr><th>Mode</th><th>Formula</th><th>Use Case</th></tr></thead>
                     <tbody>
                         <tr><td><strong>Add</strong></td><td>result = terrain + stamp</td><td>The default for every stamp: raised shapes rise, carving shapes (Crater, Valley, River) dig in</td></tr>
@@ -534,6 +605,61 @@ library.LoadPreset("Impact Site");</code></pre>
             }
         });
     });
+</script>
+
+<script>
+    // Light / dark theme switch. The choice is remembered (shared by the OpenHeightmap and
+    // OpenStamper docs); without one, the page follows the system setting.
+    (function () {
+        var button = document.getElementById('themeToggle');
+        var media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+
+        function currentTheme() {
+            return document.documentElement.getAttribute('data-bs-theme') === 'light' ? 'light' : 'dark';
+        }
+
+        function savedTheme() {
+            try {
+                return localStorage.getItem('openToolsDocsTheme');
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            var icon = button.querySelector('i');
+
+            // Show the theme the button switches to.
+            if (theme === 'light') {
+                icon.className = 'bi bi-moon-stars';
+            } else {
+                icon.className = 'bi bi-sun';
+            }
+        }
+
+        applyTheme(currentTheme());
+
+        button.addEventListener('click', function () {
+            var next = currentTheme() === 'light' ? 'dark' : 'light';
+            applyTheme(next);
+
+            try {
+                localStorage.setItem('openToolsDocsTheme', next);
+            } catch (e) {
+                // Storage blocked (some browsers, for local files): the switch still works for this visit.
+            }
+        });
+
+        if (media && media.addEventListener) {
+            media.addEventListener('change', function (e) {
+                // Follow the system only while the user hasn't picked a theme.
+                if (savedTheme() === null) {
+                    applyTheme(e.matches ? 'light' : 'dark');
+                }
+            });
+        }
+    })();
 </script>
 
 </body>
