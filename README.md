@@ -22,8 +22,8 @@ A free Unity editor tool for stamping terrain features onto a heightmap. Stack c
 
 ## Installation
 
-1. Install OpenHeightmap.
-2. Download or clone this repository.
+1. Install [OpenHeightmap](https://github.com/deathwatchgaming/Unity-OpenHeightmap).
+2. Download or clone this [Repository](https://github.com/deathwatchgaming/Unity-OpenStamper).
 3. Copy the `Assets/OpenStamper` folder into your project's `Assets` folder.
 4. Open the tool from **Tools > OpenStamper** (Ctrl+Alt+S).
 
